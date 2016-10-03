@@ -5,6 +5,7 @@ __pycache__/
 *.py.bak
 *.project
 *.pydevproject
+*.vscode
 
 # C extensions
 *.so
