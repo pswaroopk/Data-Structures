@@ -97,35 +97,58 @@ class Algorithms(object):
             for j in range (0, i):                           
                 if array[j] <= array[i]:
                     lst.append((j, 1+length[j]))
-            index, cnt = max(lst, key=lambda item:item[1])
+            # lis,key=itemgetter(1)
+            from operator import itemgetter
+            index, cnt = max(lst, key=itemgetter(1))
+            # index, cnt = max(lst, key=lambda item:item[1])
             length[i] = cnt
             aux[i] = index
         return aux, length
-    def findLMSSolution(self, array, aux, length):       
-        cnt = 0
+
+    def findAMSequence(self, array):        
+        size = len(array)
+        aux = [None]*size
+        length = [None]*size        
+        aux [0]=0
+        length[0]=0
+        for i in range(1, size):     
+            lst = [(0, 0)]*i
+            lst[0] = (0, 0)
+            prev = array[i]
+            for j in range (i-1, -1, -1):                                         
+                if array[j] <= array[i]:
+                    a = prev%2 == 0
+                    b = array[j]%2 == 0
+                    if (a != b):
+                        prev = array[j]
+                        lst.append((j, 1+length[j]))
+            # index, cnt = max(lst, key=lambda item:item[1])
+            from operator import itemgetter
+            index, cnt = max(lst, key=itemgetter(1))
+            length[i] = cnt
+            aux[i] = index
+        return aux, length
+    def findLMSSolution(self, array):   
+        
+        aux, length = algos.findLMSequence(sequence)    
+        # aux, length = algos.findAMSequence(array)   
         size = len(array)-1
-        index = 0
+        index, cnt = 0, 0
         while size > 0:
             if cnt < length[size]:
                 cnt = length[size]                
                 index = size      
             size -= 1
-        size = len(array)
-        subArray = [None]*(cnt-1)
-        # prevVal = array[index]
-        subArray[cnt-1] = array[index]
-        cnt -= 1
-        while cnt > 1:
-            curr = aux[index]
-            subArray[cnt] = array[curr]
-            
-            prevVal = aux[]
-            cnt -= 1   
+        subArray = []
+        while index > 0:
+            subArray.append(array[index])
+            index = aux[index] 
+        subArray.reverse()
         return subArray, len(subArray)
 
         
 
-    def getRevenueArray(self, profit):            
+    def getRevenueArray(self, profit):         
        
         trace, revenue = [None]*len(profit), [None]*len(profit)
         revenue[0] = 0
@@ -139,29 +162,44 @@ class Algorithms(object):
                     trace[j] = i                    
         return trace, revenue
 
-    def getNewRevArray(self, profit, cost):            
+    def getCostRevArray(self, profit, cost):            
        
         trace, revenue = [None]*len(profit), [None]*len(profit)
         revenue[0] = 0
         #j = 0
         for j in range(1, len(profit)):# when using range, it doesnot include the last index (start, last)
             revenue[j] = -float("inf")
-            # revenue[j] = revenue[j-1]
             cutCost = 0
             for i in range(1, j+1):
-                if i == j: 
-                    cutCost = 0
-                else:
-                    cutCost = 1
+                if i != j: 
+                    cutCost = cost[j]
                 if revenue[j] < profit[i] + revenue[j-i] - cutCost:
                     revenue[j] = profit[i] + revenue[j-i] - cutCost
-                    trace[j] = i                    
+                    trace[j] = i   
         return trace, revenue
+
+    def getLimitRevArray(self, profit, limit):            
+       
+        trace, revenue = [None]*len(profit), [None]*len(profit)
+        revenue[0] = 0
+        #j = 0
+        for j in range(1, len(profit)):# when using range, it doesnot include the last index (start, last)
+            revenue[j] = -float("inf")
+            cutCost = 0
+
+            for i in range(1, j+1):
+                if revenue[j] < profit[i] + revenue[j-i]: 
+                    revenue[j] = profit[i] + revenue[j-i]
+                    trace[j] = i 
+                    
+                                   
+        return trace, revenue
+    
     
 
     def getRCPSolution(self, profit, cost):        
         #trace, revenues = self.getRevenueArray(profit)
-        trace, revenues = self.getNewRevArray(profit, cost)
+        trace, revenues = self.getCostRevArray(profit, cost)
         size = len(profit)-1
         netProfit = 0
         pieces = []
@@ -220,11 +258,14 @@ algos = Algorithms()
 """ rod cutting problem"""
 profit = [0, 1, 6, 9, 10, 13, 17, 17, 20, 24, 28]
 cost   = [0, 0, 1, 1, 2,  2,  2,  3,  3,  3,  4]
+testProfit = [0, 1, 5, 8, 10, 13, 17, 17, 20, 24, 26]#[(2, 2, 6) - 27]
 
-# print algos.getRCPSolution(profit, cost)
-sequence = [0, 7, 9, 12, 3, 5, 6, 8, 4, 15, 9]
-A, L = algos.findLMSequence(sequence)
-print algos.findLMSSolution(sequence, A, L)
+print algos.getRCPSolution(testProfit, cost)
+# sequence = [0, 7, 9, 12, 3, 5, 6, 8, 4, 15, 9]
+# testSequence = [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+# t2Seq = [0, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+# print algos.findLMSSolution(sequence)
+
 
 # start = [0, 1, 3, 0, 5, 3, 5, 6, 8, 8, 2, 12]
 # finish = [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
